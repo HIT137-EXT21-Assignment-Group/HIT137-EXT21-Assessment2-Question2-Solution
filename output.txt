@@ -32,3 +32,4 @@ Input: 1 / 0
 Tree: (/ 1 0)
 Tokens: [NUM:1] [OP:/] [NUM:0] [END]
 Result: ERROR
+
