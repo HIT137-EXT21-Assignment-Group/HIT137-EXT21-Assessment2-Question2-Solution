@@ -62,13 +62,13 @@ def tokenize(expression):
     return tokens
 
 def format_tokens_string(tokens):
-    """Formats the token list for the output file requirements[cite: 55]."""
+    """Formats the token list for the output file requirements."""
     if tokens is None:
         return "ERROR"
     return " ".join([f"[{t[0]}:{t[1]}]" if t[0] != "END" else "[END]" for t in tokens])
 
 def evaluate_file(input_path: str) -> list[dict]:
-    """Reads expressions from file and writes results to output.txt[cite: 60, 62]."""
+    """Reads expressions from file and writes results to output.txt."""
     results_list = []
     
     if not os.path.exists(input_path):
@@ -77,7 +77,7 @@ def evaluate_file(input_path: str) -> list[dict]:
     with open(input_path, 'r') as f:
         lines = f.readlines()
 
-    # Determine output path using os.path [cite: 43]
+    # Determine output path using os.path 
     output_dir = os.path.dirname(input_path)
     output_path = os.path.join(output_dir, "output.txt")
 
@@ -99,7 +99,7 @@ def evaluate_file(input_path: str) -> list[dict]:
                 return item
 
             def parse_expression():
-                """Handles Addition and Subtraction[cite: 36, 38]."""
+                """Handles Addition and Subtraction."""
                 node_tree, val = parse_term()
                 while peek()[1] in ('+', '-'):
                     op = consume()[1]
@@ -112,7 +112,7 @@ def evaluate_file(input_path: str) -> list[dict]:
                 return node_tree, val
 
             def parse_term():
-                """Handles Multiplication, Division, and Implicit Multiplication[cite: 41, 48]."""
+                """Handles Multiplication, Division, and Implicit Multiplication."""
                 node_tree, val = parse_factor()
                 while True:
                     nxt_type, nxt_val = peek()
@@ -128,7 +128,7 @@ def evaluate_file(input_path: str) -> list[dict]:
                         else:
                             val = "ERROR"
                     elif nxt_type in ("NUM", "LPAREN"): 
-                        # Logic for Implicit Multiplication [cite: 41]
+                        # Logic for Implicit Multiplication
                         right_tree, right_val = parse_factor()
                         node_tree = f"(* {node_tree} {right_tree})"
                         val = (val * right_val) if (val != "ERROR" and right_val != "ERROR") else "ERROR"
@@ -137,23 +137,23 @@ def evaluate_file(input_path: str) -> list[dict]:
                 return node_tree, val
 
             def parse_factor():
-                """Handles Unary Negation and Parentheses[cite: 38, 48]."""
+                """Handle unary parenthesised sub-expressions, and number literals."""
                 nonlocal error_occured
                 t_type, t_val = peek()
                 
                 if t_val == '-':
                     consume()
                     tree, val = parse_factor()
-                    # Negation displayed as (neg operand) [cite: 48]
+                    # Negation displayed as (neg operand)
                     return f"(neg {tree})", (-val if isinstance(val, (int, float)) else "ERROR")
                 
-                if t_val == '+': # Unary + is not supported [cite: 39]
+                if t_val == '+': # Unary + is not supported
                     error_occured = True
                     return "ERROR", "ERROR"
 
                 if t_type == "NUM":
                     val = float(consume()[1])
-                    # Formatting number literal for tree [cite: 46]
+                    # Formatting number literal for tree
                     tree_val = str(int(val)) if val.is_integer() else str(val)
                     return tree_val, val
                 
@@ -176,13 +176,13 @@ def evaluate_file(input_path: str) -> list[dict]:
                     tree_str, result = "ERROR", "ERROR"
                 token_str = format_tokens_string(tokens)
 
-            # Final result formatting [cite: 56, 57]
+            # Final result formatting
             if isinstance(result, (int, float)):
                 display_res = str(int(result)) if result.is_integer() else f"{result:.4f}".rstrip('0').rstrip('.')
             else:
                 display_res = "ERROR"
 
-            # Write formatted block to output.txt [cite: 44, 52]
+            # Write formatted block to output.txt 
             out_f.write(f"Input: {raw_input}\nTree: {tree_str}\nTokens: {token_str}\nResult: {display_res}\n\n")
 
             results_list.append({
@@ -194,8 +194,10 @@ def evaluate_file(input_path: str) -> list[dict]:
             
     return results_list
 
+# ---------------------------------------------------------------------------
+# Smoke test when run directly
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    # Minimal smoke test
     sample = "sample_input.txt"
     if os.path.exists(sample):
         results = evaluate_file(sample)
