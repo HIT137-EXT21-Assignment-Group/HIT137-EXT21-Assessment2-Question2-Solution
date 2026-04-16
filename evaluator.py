@@ -1,10 +1,46 @@
+"""
+HIT137 Assignment 2 - Question 2
+COntibutors: Saugat Poudel (s395696) and Aseem Neupane (s396016)
+Recursive Descent Expression Evaluator
+ 
+Reads mathematical expressions from a text file (one per line), evaluates each
+expression, and writes a formatted report to "output.txt" in the same directory.
+ 
+Supports:
+    - Binary operators: + - * /
+    - Parentheses (nested to any depth)
+    - Unary negation: -5, --5, -(3+4), 3 * -2
+    - Implicit multiplication: 2(3+4), (2+3)(4+5)
+    - Integer and decimal number literals
+ 
+Rejects (produces ERROR):
+    - Unary plus (e.g., +5)
+    - Unbalanced parentheses
+    - Invalid characters
+    - Division by zero
+    - Malformed number literals (e.g., .5, 5.)
+ 
+Grammar (standard recursive descent, one function per precedence level):
+    expression -> term    (('+' | '-') term)*
+    term       -> factor  (('*' | '/') factor | factor)*       # last alt is implicit *
+    factor     -> '-' factor | '(' expression ')' | NUMBER
+"""
 import re
 import os
 
 def tokenize(expression):
-    """Uses regex to extract all tokens from the expression."""
+    """
+    Split an expression string into a list of (TYPE, value) token tuples.
+ 
+    Token types: NUM, OP, LPAREN, RPAREN, END.
+    Returns None if the expression contains characters that are not part of
+    any valid token (which signals a tokenisation error to the caller).
+ 
+    Note: unary negation is NOT folded into the number literal. The input "-5"
+    produces [OP:-] [NUM:5] [END], as required by the spec.
+    """
     # Pattern handles numbers (with decimals), operators, and parentheses
-    pattern = r"\d+\.?\d*|[\+\-\*\/\(\)]"
+    pattern = r"\d+\.\d+|\d+|[+\-*/()]"
     matches = re.findall(pattern, expression)
     
     # Check for invalid characters by comparing reconstructed string
@@ -13,7 +49,7 @@ def tokenize(expression):
         
     tokens = []
     for m in matches:
-        if m.isdigit() or ('.' in m and m.replace('.', '', 1).isdigit()):
+        if m[0].isdigit():
             tokens.append(("NUM", m))
         elif m in "+-*/":
             tokens.append(("OP", m))
